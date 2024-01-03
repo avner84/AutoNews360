@@ -1,0 +1,155 @@
+.newsContainer {
+  max-width: 1200px;
+  margin: 50px auto;
+
+  /* margin-top: 50px; */
+}
+
+.newsContainer a {
+    text-decoration: none;
+    color: black;
+  }
+
+.mainArticle {
+  max-width: 1000px;
+  margin: 0 auto;
+cursor: pointer;
+  display: flex;
+  flex-direction: row;
+}
+
+.mainArticle > div {
+  flex: 1;
+}
+
+.mainArticleImage img {
+  width: 100%;
+  /* height: 100%;        */
+  object-fit: cover;
+}
+
+.mainArticleContent {
+  text-align: left;
+  padding: 20px;
+  padding-top: 0;
+  /* background-color: red; */
+  /* color: white; */
+}
+
+.mainArticleContent h1 {
+  margin-top: 0;
+  text-align: left;
+}
+
+.mainArticleContent p {
+  font-size: 1.2rem;
+  text-align: justify;
+}
+
+.mainArticleContent small {
+  font-size: 1rem;
+  color: gray;
+  font-weight: 500;
+}
+
+.subArticlesContainer {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.subArticle {
+  margin-top: 25px;
+  max-width: 800px;
+  display: grid;
+  grid-template-columns: 1fr 2.5fr;
+  height: 200px;
+  overflow: hidden;
+  text-align: justify;
+  cursor: pointer;
+}
+
+.subArticleImgContainer {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  padding-right: 25px;
+}
+
+.subArticle img {
+  height: 100%;
+  object-fit: cover;
+}
+
+.subArticleContent {
+  background-color:#cf041c;
+  color: white;
+  padding-left: 35px;
+  padding-right: 35px;
+  overflow: hidden;
+}
+
+.diverLine {
+  max-width: 1000px;
+  margin: 30px auto;
+  height: 50px;
+  background: var(--primaryBlue);
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  color: white;
+  padding-left: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.miniArticlesContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  max-width: 1000px;
+  margin: 20px auto;
+ 
+}
+
+.miniArticle {
+  display: grid;
+  grid-template-columns: 1fr 2.5fr;
+  cursor: pointer;
+  margin-bottom: 30px;
+}
+
+.miniArticleImgContainer{
+    width: 100%;
+}
+
+
+.miniArticle img {
+    width: 100%;
+    height: 100%;  
+  object-fit: cover;
+}
+
+.miniArticleContent{   
+    font-family:Arial, Helvetica, sans-serif ;
+}
+
+.miniArticleContent h5 {
+    margin: 10px;
+    text-align: justify;
+}
+
+
+.newsContainer > h2 {
+text-align: center;
+}
+
+.modalContent {
+  font-weight: 500;
+  
+
+}
+
+.modalContent a {
+  font-weight: 500;
+  color: blue
+
+}

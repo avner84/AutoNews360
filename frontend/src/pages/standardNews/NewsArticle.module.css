@@ -1,0 +1,50 @@
+.articleContainer {
+  max-width: 800px;
+  margin: 50px auto;
+  
+}
+.articleContainer h1 {
+    text-align: center;
+    font-size: 2rem ;
+}
+
+.articleContainer h2 {
+    text-align: justify;
+    font-weight: 400;
+    margin-top: 40px;
+}
+
+.articleDetails{
+    display: flex;
+    justify-content: space-between;
+    font-family:Arial, Helvetica, sans-serif ;
+}
+
+.articleDetails p{
+    margin: 16px 0;
+}
+.articleDetails .category{
+font-size:  1.3rem;
+color: var(--primaryBlue);
+font-weight: 600;
+}
+
+.articleContainer img {
+    width: 100%;
+}
+
+.content{
+    text-align: justify;
+    font-size: large;
+    line-height: 170%;
+}
+
+.articleContainer > h2 {
+    text-align: center;
+}
+
+.accessDeniedAlert{
+    text-align: center;
+    font-size: 1.3rem;
+    margin-top: 40px;
+}

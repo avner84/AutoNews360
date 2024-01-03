@@ -1,0 +1,39 @@
+.avatarNewsVideoContainer {
+  width: 100%;
+  height: calc(100vh - 100px);
+  background-color: rgb(231, 244, 254);
+}
+
+.videoWrapper {
+  padding-top: 100px;
+  text-align: center;
+}
+
+.videoWrapper video {
+  display: block;
+  margin: auto;
+  width: 854px;
+  height: 480px;
+}
+
+
+.avatarNewsVideoContainer > h2 {
+text-align: center;
+margin: 0 auto;
+padding-top: 50px;
+}
+
+
+.accessDeniedAlert{
+  text-align: center;
+  font-size: 1.3rem;
+  margin-top: 40px;
+}
+
+@media screen and (max-width: 1340px) {
+    .videoWrapper video {
+      width: 640px;
+      height: 360px;
+    }
+  
+  }

@@ -1,0 +1,10 @@
+{
+  "description": "",
+  "scripts": {
+    "start": "concurrently \"cd frontend && npm start\" \"cd backend && node app.js\" \"cd backend && node proxyServer.js\"",
+    "install-all": "npm install && cd frontend && npm install && cd .. && cd backend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

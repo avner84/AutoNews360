@@ -1,0 +1,105 @@
+.navbar {
+  background: var(--primaryBlue);
+  height: 50px;
+}
+
+.navbar nav {  
+  padding-top: 5px;
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.navbar nav h1 {
+  border-bottom: 3px solid red;
+  margin: 0;
+}
+
+.navbar nav a {
+  text-decoration: none;
+  padding: 6px;
+  border-radius: 4px;
+  color: white;
+  user-select: none;
+}
+
+.logoutButton {
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 4px;
+  color: white;
+  user-select: none;
+  font-size: 1rem;
+  background: none;
+}
+
+.navbar nav .logo {
+  margin-right: auto;
+  padding: 0;
+}
+
+.navbar a:hover {  
+  opacity: 0.6;
+}
+
+.navbar a.active {
+  opacity: 1;
+  font-weight: 500;
+  background: white;
+  color: var(--primaryBlue);
+}
+
+.logoutButton:hover {
+  background: yellow;
+  opacity: 0.6;
+  color: silver;
+}
+
+.navbar nav .logo:hover { 
+  opacity: 0.9;
+}
+
+.iconProgile {
+  padding: 6px;
+  color: white;
+  user-select: none;
+  margin-top: 5px;
+  border: 1px solid white;
+  border-radius: 50%;
+  padding: 5px;
+}
+
+.iconProgile:hover{
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.profileMenu {
+  position: absolute;
+  top: 50px; /* The height of the navigation bar */
+  right: 0;
+  background: #003366;
+  color: white;
+  border: 1px solid white;
+  display: flex;
+  flex-direction: column; 
+   
+}
+
+.profileMenu a {
+  border-bottom: 1px solid white;  
+}
+
+
+.profileMenu .logout, .profileMenu .profileMenuNav{
+  padding: 13px 10px;
+  margin: 0px;
+  cursor: pointer;
+}
+
+.profileMenu .logout:hover{
+ opacity: 0.6;
+}

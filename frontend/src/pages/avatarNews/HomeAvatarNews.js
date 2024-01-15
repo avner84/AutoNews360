@@ -2,12 +2,15 @@ import styles from "./HomeAvatarNews.module.css";
 import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { useUser } from "../../store/UserContext";
-import Modal from "../../components/Modal";
+import Modal from "../../components/UI/modal/Modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVideo } from "@fortawesome/free-solid-svg-icons";
 
 import SofiaAvatar from "./avatarImages/Sofia-image.png";
 import JackAvatar from "./avatarImages/Jack-image.png";
+
+import config from '../../config/default'
+const {REACT_APP_API_URL} = config;
 
 // HomeAvatarNews component displays news articles presented by avatars.
 const HomeAvatarNews = () => {
@@ -43,7 +46,7 @@ const HomeAvatarNews = () => {
         </p>
       </Modal>
 
-      {articles && articles.length > 0 ? (
+      {articles?.length > 0 ? (
         <>
           <header className={styles.header}>
             <h1>
@@ -99,9 +102,9 @@ const HomeAvatarNews = () => {
 
 // avatarNewsLoader function fetches the latest articles from the server.
 // In case of an error, it returns an empty array.
-export async function avatarNewsLoader() {
+export const avatarNewsLoader = async () => {
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/news/latest-articles`);
+    const response = await fetch(`${REACT_APP_API_URL}/news/latest-articles`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

@@ -3,7 +3,10 @@ import styles from "./MainNavbar.module.css";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { useUser } from "../../store/UserContext";
+import { useUser } from "../../../store/UserContext";
+
+import config from '../../../config/default'
+const {REACT_APP_API_URL} = config;
 
 const MainNavbar = () => {
   const { user, setUser } = useUser();
@@ -31,7 +34,7 @@ const MainNavbar = () => {
       const fetchData = async () => {
         try {
           // Sending a request to validate the token
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/login-by-token`, {
+          const response = await fetch(`${REACT_APP_API_URL}/auth/login-by-token`, {
             method: 'POST',
             headers: {              
                 'Authorization': `Bearer ${token}`
@@ -44,9 +47,9 @@ const MainNavbar = () => {
           }
   
            // Setting user data on successful validation
-          const userData = await response.json();
-          localStorage.setItem('token', userData.token);
-          setUser(userData.user);
+           const { token: newToken, user: newUser } = await response.json();
+           localStorage.setItem('token', newToken);
+           setUser(newUser);
         } catch (error) {
            console.error(error);
           localStorage.removeItem("token");

@@ -2,16 +2,21 @@ import styles from "./NewsArticle.module.css";
 import { useLoaderData, Link } from "react-router-dom";
 import { useUser } from "../../store/UserContext";
 
+import config from '../../config/default'
+const {REACT_APP_API_URL} = config;
+
+
 const NewsArticle = () => {
   const { article, error } = useLoaderData();
   const { setUser } = useUser();
 
    // Handle different types of errors
   if (error) {
+    const { message } = error;
     let errorMessage = (
       <h2>There was an error on the site. Please try to enter later.</h2>
     );
-    if (error.message === "Authentication failed. Please log in.") {
+    if (message === "Authentication failed. Please log in.") {
       errorMessage = (
         <p className={styles.accessDeniedAlert}>
           In order to view the article, you must <Link to="/login">log in</Link>{" "}
@@ -20,9 +25,9 @@ const NewsArticle = () => {
       );
       localStorage.removeItem("token");
       setUser();
-    } else if (error.message === "Article not found.") {
+    } else if (message === "Article not found.") {
       errorMessage = <h2>Article not found.</h2>;
-    } else if (error.message === "Server error. Please try again later.") {
+    } else if (message === "Server error. Please try again later.") {
       errorMessage = <h2>Server error. Please try again later.</h2>;
     }
     return <div className={styles.articleContainer}> {errorMessage} </div>;
@@ -37,20 +42,22 @@ const NewsArticle = () => {
     );
   }
 
+  const { title, description, category, pubDate, image_url, content } = article;
+
    // Render the article
   return (
     <div className={styles.articleContainer}>
       {article ? (
         <>
-          <h1>{article.title}</h1>
-          <h2>{article.description}</h2>
+          <h1>{title}</h1>
+          <h2>{description}</h2>
           <hr />
           <div className={styles.articleDetails}>
-            <p className={styles.category}>category: {article.category[0]}</p>
-            <p className={styles.publishDate}>{article.pubDate}</p>
+            <p className={styles.category}>category: {category[0]}</p>
+            <p className={styles.publishDate}>{pubDate}</p>
           </div>
-          <img src={article.image_url} alt={article.title} />
-          <p className={styles.content}>{article.content}</p>
+          <img src={image_url} alt={title} />
+          <p className={styles.content}>{content}</p>
         </>
       ) : (
         <h2>There was an error on the site. Please try to enter later.</h2>
@@ -71,7 +78,7 @@ export async function articleLoader({ params }) {
 
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/news/article?id=${articleId}`,
+      `${REACT_APP_API_URL}/news/article?id=${articleId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -98,8 +105,8 @@ export async function articleLoader({ params }) {
       throw new Error(error);
     }
 
-    const data = await response.json();
-    return { article: data.article };
+    const {article} = await response.json();
+    return { article };
   } catch (error) {
     console.error("Failed to load blog:", error);
     return { error };

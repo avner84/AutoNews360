@@ -3,6 +3,8 @@ import { Form, useActionData, useSubmit } from "react-router-dom";
 import styles from "./SignUp.module.css";
 import BeatLoader from "react-spinners/BeatLoader";
 
+import config from '../../config/default'
+const {REACT_APP_API_URL} = config;
 
 
 export default function SignUpForm() {
@@ -17,7 +19,7 @@ export default function SignUpForm() {
   };
 
   // When the success message is received from the action, update the state variable
-  if (data && data.success && !isSignedUp) {
+  if (data?.success && !isSignedUp) {
     setIsSignedUp(true);
   }
 
@@ -92,8 +94,8 @@ export default function SignUpForm() {
         ) : (
           <BeatLoader color="#0056b3" cssOverride={override} />
         )}
-        {errorMessage && <p className={styles.error}>{errorMessage}</p>}
-        {data && data.error && <p className={styles.error}>{data.error}</p>}
+        {errorMessage && !isSubmitting &&  <p className={styles.error}>{errorMessage}</p>}
+        {data?.error && !isSubmitting && <p className={styles.error}>{data.error}</p>}
       </Form>
     </div>
   );
@@ -103,34 +105,32 @@ export default function SignUpForm() {
 export const signUpAction = async ({ request }) => {
   const data = await request.formData();
 
-  const formData = {
-    firstName: data.get("firstName"),
-    lastName: data.get("lastName"),
-    email: data.get("email"),
-    password: data.get("password"),
-    confirmPassword: data.get("confirmPassword"),
-  };
+  const firstName = data.get("firstName");
+  const lastName = data.get("lastName");
+  const email = data.get("email");
+  const password = data.get("password");
+  const confirmPassword = data.get("confirmPassword");
 
-  console.log(formData);
+
 
   // Check if passwords match
-  if (formData.password !== formData.confirmPassword) {
+  if (password !== confirmPassword) {
     return { error: "Passwords do not match." };
   }
 
   // Check password length
-  if (formData.password.length < 6) {
+  if (password.length < 6) {
     return { error: "Password must be over 6 chars long." };
   }
 
   // Send your PUT request to sign up the user
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/signup`, {
+    const response = await fetch(`${REACT_APP_API_URL}/auth/signup`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ firstName, lastName, email, password, confirmPassword }),
     });
 
     const result = await response.json();

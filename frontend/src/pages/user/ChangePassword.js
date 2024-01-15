@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 import BeatLoader from "react-spinners/BeatLoader";
 import styles from './ChangePassword.module.css';
 
+import config from '../../config/default'
+const {REACT_APP_API_URL} = config;
+
  const override = {
     marginTop: "20px",
 };
@@ -86,7 +89,8 @@ const ChangePassword = () => {
                     ) : (
                     <button type="submit">Change Password</button>
                     )}
-                    {data && data.error && <p className={styles.error}>{data.error}</p>}
+                    {data?.error && !isLoading &&<p className={styles.error}>{data.error}</p>}
+
                 </Form>
             )}
         </div>
@@ -115,7 +119,7 @@ export const changePasswordAction = async ({ request }) => {
         }
 
         // Execute the request to the server.
-        const response = await fetch('http://localhost:8080/auth/change-password', {
+        const response = await fetch(`${REACT_APP_API_URL}/user/change-password`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

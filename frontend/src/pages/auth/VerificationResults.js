@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import BeatLoader from "react-spinners/BeatLoader";
 import styles from "./VerificationResults.module.css";
-import axios from "axios";
+
+import config from '../../config/default'
+const {REACT_APP_API_URL} = config;
 
 const VerificationResults = () => {
-  const [status, setStatus] = useState("");
-  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState(""); 
+  const [emailFromUrl, setEmailFromUrl] = useState("");
+  const [userEmail, setUserEmail] = useState("");  
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -14,18 +17,18 @@ const VerificationResults = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setStatus(params.get("status"));
-    setEmail(params.get("email"));
+    setEmailFromUrl(params.get("email"));
   }, [location]);
 
   const handleResendClick = async () => {
     setIsLoading(true);
+    const emailToSend = emailFromUrl || userEmail;
     try {
        // Perform the request to the server
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/auth/resend-verification?email=${email}`
-      );
-      if (response.data.redirect) {
-        navigate(`/${response.data.redirect}`);
+       const response = await fetch(`${REACT_APP_API_URL}/auth/resend-verification?email=${emailToSend}`);
+       const responseData = await response.json();
+      if (responseData.redirect) {
+        navigate(`/${responseData.redirect}`);
       }    
     } catch (error) {
       console.error("Error resending verification email: ", error);
@@ -46,7 +49,7 @@ const VerificationResults = () => {
         </div>
       )}
 
-      {status === "expired" && email && (
+      {status === "expired" && emailFromUrl && (
         <div className={styles.expiredDiv}>
           <p>
             It seems that too much time has passed since the verification
@@ -62,7 +65,7 @@ const VerificationResults = () => {
         </div>
       )}
 
-      {(status === "error" || (status === "expired" && !email)) && (
+      {(status === "error" || (status === "expired" && !emailFromUrl)) && (
         <div className={styles.errorDiv}>
           <p>
             Unfortunately, there was an error in the process of verifying your
@@ -72,8 +75,8 @@ const VerificationResults = () => {
             <>
               <input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
                 placeholder="Enter your email"
               />
               <button onClick={handleResendClick}>

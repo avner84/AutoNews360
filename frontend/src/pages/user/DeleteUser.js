@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from '../../store/UserContext';
 import styles from './DeleteUser.module.css';
 
+import config from '../../config/default'
+const {REACT_APP_API_URL} = config;
+
+
 const DeleteUser = () => {
   const navigate = useNavigate();
   const { setUser } = useUser();
@@ -24,7 +28,7 @@ const DeleteUser = () => {
   const handleConfirmDelete = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/auth/delete-user', {
+      const response = await fetch(`${REACT_APP_API_URL}/user/delete-user`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -1,15 +1,16 @@
-require("dotenv").config();
 const fetch = require("node-fetch"); // Importing the fetch function
-const News = require("../models/news");
+const {NEWSDATA_API_URL} = require('../config/vars')
+
 const {
   logToFile,
   readLastAvatar,
   saveLastAvatar,
 } = require("../utils/logger");
+const { findArticle, createAndSaveArticle } = require("../data-access/news");
 
 exports.fetchAndSaveNews = async () => {
   try {
-    const response = await fetch(process.env.NEWSDATA_API_URL);
+    const response = await fetch(NEWSDATA_API_URL);
     const data = await response.json();
 
     let articlesSaved = 0;
@@ -21,42 +22,48 @@ exports.fetchAndSaveNews = async () => {
     for (const article of data.results) {
       totalArticles++;
 
+      const {
+        title,
+        link,
+        content,
+        description,
+        pubDate,
+        image_url,
+        category,
+        article_id,
+        creator,
+      } = article;
+
       // Check if the article already exists in the database
-      const existingArticle = await News.findOne({
-        provider_article_id: article.article_id,
-      });
+      const existingArticle = await findArticle({ provider_article_id: article_id });
 
       // If the article doesn't exist and all required fields are present and the content is not too short (at least 231 characters)
       if (
         !existingArticle &&
-        article.title &&
-        article.link &&
-        article.content &&
-        article.content.length > 230 &&
-        article.description &&
-        article.pubDate &&
-        article.image_url &&
-        article.category
+        title &&
+        link &&
+        content?.length > 230 &&
+        description &&
+        pubDate &&
+        image_url &&
+        category
       ) {
-        const newArticle = new News({
-          provider_article_id: article.article_id,
-          title: article.title,
-          link: article.link,
-          author:
-            Array.isArray(article.creator) && article.creator.length > 0
-              ? article.creator[0]
-              : "Author not found",
-          content: article.content,
-          description: article.description,
-          pubDate: new Date(article.pubDate),
-          image_url: article.image_url,
-          category: article.category[0],
-          avatar: currentAvatar,
-        });
+        const articleData = {
+          title,
+          link,
+          content,
+          description,
+          image_url,
+          provider_article_id: article_id,
+          author: creator?.[0] || "Author not found",
+          pubDate: new Date(pubDate),
+          category: category[0],
+          avatar: currentAvatar
+        };
 
-        await newArticle.save();
+        await createAndSaveArticle(articleData);
         articlesSaved++;
-        savedTitles.push(article.title);
+        savedTitles.push(title);
         savedArticles.push(article);
 
         // Alternating the avatar
@@ -68,19 +75,19 @@ exports.fetchAndSaveNews = async () => {
     const logData = {
       fetched: totalArticles,
       saved: articlesSaved,
-      fetchedArticles: data.results.map((article, index) => ({
+      fetchedArticles: data.results.map(({ title, link, article_id }, index) => ({
         number: index + 1,
-        title: article.title,
-        link: article.link,
-        article_id: article.article_id,
+        title,
+        link,
+        article_id,
       })),
-      savedArticles: savedArticles.map((article, index) => ({
+      savedArticles: savedArticles.map(({ title, link, article_id, category, avatar }, index) => ({
         number: index + 1,
-        title: article.title,
-        link: article.link,
-        article_id: article.article_id,
-        category: article.category[0],
-        avatar: article.avatar,
+        title,
+        link,
+        article_id,
+        category: category[0],
+        avatar,
       })),
     };
 

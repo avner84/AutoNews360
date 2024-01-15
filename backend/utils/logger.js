@@ -2,9 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 // Function for logging to a file
-function logToFile(data) {
+function logToFile({ fetched, saved, fetchedArticles, savedArticles }) {
     const logFilePath = path.join(__dirname, '../logs/fetchLog.txt');
-    const logEntry = `Time: ${new Date().toISOString()}\nFetched: ${data.fetched}\nSaved: ${data.saved}\nFetched Articles: ${JSON.stringify(data.fetchedArticles, null, 2)}\nSaved Articles: ${JSON.stringify(data.savedArticles, null, 2)}\n\n   --------------------------------------------------------------\n\n`;
+    const logEntry = `Time: ${new Date().toISOString()}\nFetched: ${fetched}\nSaved: ${saved}\nFetched Articles: ${JSON.stringify(fetchedArticles, null, 2)}\nSaved Articles: ${JSON.stringify(savedArticles, null, 2)}\n\n   --------------------------------------------------------------\n\n`;
 
     fs.appendFile(logFilePath, logEntry, err => {
         if (err) {

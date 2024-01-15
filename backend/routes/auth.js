@@ -1,53 +1,33 @@
 const express = require("express");
 const router = express.Router();
-const authController = require("../controllers/auth");
-const validations = require("../middleware/validations");
+const {
+  signup,
+  verify,
+  requestResendVerification,
+  updateVerification,
+  login,
+  loginByToken
+} = require("../controllers/auth");
+const {
+  signupValidations,  
+  loginValidations 
+} = require("../validations/auth");
+
+const {handleValidationErrors} = require("../validations/errorHandling");
+
 const isAuth = require("../middleware/is-auth");
 
-router.put(
-  "/signup",
-  validations.signupValidations,
-  validations.handleValidationErrors,
-  authController.signup
-);
+router.put("/signup", [signupValidations, handleValidationErrors], signup);
 
-router.get("/verify", authController.verify);
+router.get("/verify", verify);
 
-router.get("/resend-verification", authController.requestResendVerification);
+router.get("/resend-verification", requestResendVerification);
 
-router.get("/update-verification", authController.updateVerification);
+router.get("/update-verification", updateVerification);
 
+router.post("/login", [loginValidations, handleValidationErrors], login);
+
+router.post("/login-by-token", isAuth, loginByToken);
 
 
-router.post(
-  "/login",
-  validations.loginValidations,
-  validations.handleValidationErrors,
-  authController.login
-);
-
-router.post(
-    "/login-by-token",
-    isAuth,
-    authController.loginByToken
-  );
-
-router.patch(
-  "/change-password",
-  isAuth,
-  validations.changePasswordValidations,
-  validations.handleValidationErrors,
-  authController.changePassword
-);
-
-router.delete("/delete-user", isAuth, authController.deleteUser);
-
-router.patch(
-  "/edit-user",
-  isAuth,
-  validations.editUserValidations,
-  validations.handleValidationErrors,
-  authController.userEdit
-);
-
-module.exports = router;
+module.exports=router;

@@ -1,5 +1,5 @@
 import { Outlet, ScrollRestoration } from "react-router-dom"
-import MainNavbar from "../components/navbars/MainNavbar"
+import MainNavbar from "../navbars/MainNavbar"
 
 export default function RootLayout() {
   return (

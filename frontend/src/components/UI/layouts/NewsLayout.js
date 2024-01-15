@@ -1,6 +1,6 @@
 
 import { Outlet } from "react-router-dom";
-import NewsNavbar from '../components/navbars/NewsNavBar'
+import NewsNavbar from '../navbars/NewsNavBar'
 
 const NewsLayout = () => {
 

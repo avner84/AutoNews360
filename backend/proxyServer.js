@@ -1,16 +1,14 @@
-require("dotenv").config();
-
 const fastify = require("fastify")({ logger: true });
 const fetch = require("node-fetch");
 const cors = require("@fastify/cors");
-
-const API_KEY = process.env.D_ID_API_KEY;
+const {proxyServerUrl, proxyPort} = require('./config/default');
+const {D_ID_API_KEY: API_KEY} = require('./config/vars');
 
 // Enable CORS for all requests
 fastify.register(cors, { origin: true });
 
 // Endpoint for creating a new stream
-fastify.post("/api/talks/streams", async (request, reply) => {
+fastify.post("/api/talks/streams", async (req, reply) => {
   // Log the request details to the external API
   console.log("Request data to the external API:", {
     method: "POST",
@@ -18,7 +16,7 @@ fastify.post("/api/talks/streams", async (request, reply) => {
       Authorization: `Basic ${API_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(request.body),
+    body: JSON.stringify(req.body),
   });
 
   // Perform the API request
@@ -28,7 +26,7 @@ fastify.post("/api/talks/streams", async (request, reply) => {
       Authorization: `Basic ${API_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(request.body),
+    body: JSON.stringify(req.body),
   });
 
   // Retrieve and log the response from the external API
@@ -40,8 +38,8 @@ fastify.post("/api/talks/streams", async (request, reply) => {
 });
 
 // Endpoint for posting the Session Description Protocol (SDP) data
-fastify.post("/api/talks/streams/sdp", async (request, reply) => {
-  const { streamId, answer, sessionId } = request.body;
+fastify.post("/api/talks/streams/sdp", async (req, reply) => {
+  const { streamId, answer, sessionId } = req.body;
 
   // Perform the API request to the external service
   const sdpResponse = await fetch(
@@ -53,7 +51,7 @@ fastify.post("/api/talks/streams/sdp", async (request, reply) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        answer: answer,
+        answer,
         session_id: sessionId,
       }),
     }
@@ -68,8 +66,8 @@ fastify.post("/api/talks/streams/sdp", async (request, reply) => {
 });
 
 // Endpoint for initiating a talk stream
-fastify.post("/api/talks/streams/talk", async (request, reply) => {
-  const { streamId, sessionId, text, avatar } = request.body;
+fastify.post("/api/talks/streams/talk", async (req, reply) => {
+  const { streamId, sessionId, text, avatar } = req.body;
 
   // Perform the API request to the external service
   const talkResponse = await fetch(
@@ -111,8 +109,8 @@ fastify.post("/api/talks/streams/talk", async (request, reply) => {
 });
 
 // Endpoint for destroying a stream
-fastify.post("/api/talks/streams/destroy", async (request, reply) => {
-  const { streamId, sessionId } = request.body;
+fastify.post("/api/talks/streams/destroy", async (req, reply) => {
+  const { streamId, sessionId } = req.body;
 
   // Perform the API request to the external service
   const destroyResponse = await fetch(
@@ -136,9 +134,9 @@ fastify.post("/api/talks/streams/destroy", async (request, reply) => {
 });
 
 // Endpoint for ICE candidate exchange
-fastify.post("/api/talks/streams/ice", async (request, reply) => {
+fastify.post("/api/talks/streams/ice", async (req, reply) => {
   const { streamId, candidate, sdpMid, sdpMLineIndex, sessionId } =
-    request.body;
+    req.body;
 
   // Perform the API request to the external service
   const iceResponse = await fetch(
@@ -150,9 +148,9 @@ fastify.post("/api/talks/streams/ice", async (request, reply) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        candidate: candidate,
-        sdpMid: sdpMid,
-        sdpMLineIndex: sdpMLineIndex,
+        candidate,
+        sdpMid,
+        sdpMLineIndex,
         session_id: sessionId,
       }),
     }
@@ -168,8 +166,8 @@ fastify.post("/api/talks/streams/ice", async (request, reply) => {
 
 
 // Start the server
-const PROXY_SERVER_URL = process.env.PROXY_SERVER_URL || "http://localhost";
-const PROXY_SERVER_PORT = process.env.PROXY_SERVER_PORT || 3001;
+const PROXY_SERVER_URL = proxyServerUrl || "http://localhost";
+const PROXY_SERVER_PORT = proxyPort || 3001;
 
 
 fastify.listen({ port: PROXY_SERVER_PORT }, (err) => {

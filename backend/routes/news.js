@@ -1,18 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const isAuth = require("../middleware/is-auth");
-const newsController = require('../controllers/news')
+const { getArticles, getArticleById } = require("../controllers/news");
 
+router.get("/latest-articles", getArticles);
 
-router.get(
-    '/latest-articles',
-    newsController.getArticles
-)
-
-router.get(
-    '/article',
-    isAuth,
-    newsController.getArticleById
-)
+router.get("/article", isAuth, getArticleById);
 
 module.exports = router;

@@ -1,8 +1,17 @@
-import { Form, useActionData, useNavigate, useSubmit, Link } from "react-router-dom";
+import {
+  Form,
+  useActionData,
+  useNavigate,
+  useSubmit,
+  Link,
+} from "react-router-dom";
 import BeatLoader from "react-spinners/BeatLoader";
 import styles from "./Login.module.css";
 import { useState, useEffect } from "react";
 import { useUser } from "../../store/UserContext";
+
+import config from '../../config/default'
+const {REACT_APP_API_URL} = config;
 
 export default function LoginForm() {
   const data = useActionData();
@@ -21,9 +30,11 @@ export default function LoginForm() {
     if (data) {
       setIsLoading(false); // Turn off loading mode
 
-      if (data?.user) {
-        localStorage.setItem("token", data.token);
-        setUser(data.user);
+      const { user, token } = data;
+
+      if (user) {
+        localStorage.setItem("token", token);
+        setUser(user);
         navigate("/"); // Navigate to home page after successful login
       }
     }
@@ -54,15 +65,16 @@ export default function LoginForm() {
         ) : (
           <button type="submit">Login</button>
         )}
+        {data?.error && !isLoading && (
+          <p className={styles.error}>{data.error}</p>
+        )}
 
-        {data && data.error && !isLoading &&<p className={styles.error}>{data.error}</p>}
-        
-        {data && data.error && !isLoading && data.error.includes("User account is not active.") && (
-        <p className={styles.verificationPrompt} >
-          To receive a new verification code, please click{" "}
-          <Link to="/verification-results?status=expired">here</Link>.
-        </p>
-      )}       
+        {data?.error?.includes("User account is not active.") && !isLoading && (
+          <p className={styles.verificationPrompt}>
+            To receive a new verification code, please click{" "}
+            <Link to="/verification-results?status=expired">here</Link>.
+          </p>
+        )}
       </Form>
     </div>
   );
@@ -82,7 +94,7 @@ export const loginAction = async ({ request }) => {
   try {
     // Sending login request to the server
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/auth/login`,
+      `${REACT_APP_API_URL}/auth/login`,
       {
         method: "POST",
         headers: {

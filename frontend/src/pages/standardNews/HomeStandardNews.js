@@ -2,7 +2,11 @@ import styles from "./HomeStandardNews.module.css";
 import { useLoaderData, useNavigate, Link } from "react-router-dom";
 import React, { useState } from 'react';
 import { useUser } from "../../store/UserContext";
-import Modal from '../../components/Modal';
+import Modal from '../../components/UI/modal/Modal';
+
+import config from '../../config/default'
+const {REACT_APP_API_URL} = config;
+
 
 // HomeStandardNews component displays the main news articles on the home page.
 const HomeStandardNews = () => {
@@ -33,7 +37,7 @@ const HomeStandardNews = () => {
         <p className={styles.modalContent}>In order to view the article, you must <Link to="/login">log in</Link> or <Link to="/signup">register</Link> to the site.</p>
       </Modal>
 
-      {articles && articles.length > 0 ? (
+      {articles?.length > 0 ? (
         <>
         {/* mainArticle */}
           <div
@@ -52,21 +56,21 @@ const HomeStandardNews = () => {
 
           {/* 3 sub-articles displayed beneath the main article  */}
           <div className={styles.subArticlesContainer}>
-            {articles.slice(1, 4).map((article, index) => (
+            {articles.slice(1, 4).map(({ _id, title, description, image_url }, index) => (
               <div
-                key={article._id}
+                key={_id}
                 className={styles.subArticle}
-                onClick={() => handleArticleClick(article._id)}
+                onClick={() => handleArticleClick(_id)}
               >
                 <div className={styles.subArticleImgContainer}>
-                  <img src={article.image_url} alt={article.title} />
+                  <img src={image_url} alt={title} />
                 </div>
                 <div
                   className={styles.subArticleContent}
                   style={index === 1 ? { backgroundColor: "#003366" } : {}}
                 >
-                  <h3>{article.title}</h3>
-                  <p>{article.description}</p>
+                  <h3>{title}</h3>
+                  <p>{description}</p>
                 </div>
               </div>
             ))}
@@ -78,17 +82,17 @@ const HomeStandardNews = () => {
 
           {/* Previous articles appear at the bottom of the page */}
           <div className={styles.miniArticlesContainer}>
-            {articles.slice(4, 10).map((article) => (
+            {articles.slice(4, 10).map(({_id, image_url, title, }) => (
               <div
-                key={article._id}
+                key={_id}
                 className={styles.miniArticle}
-                onClick={() => handleArticleClick(article._id)}
+                onClick={() => handleArticleClick(_id)}
               >
                 <div className={styles.miniArticleImgContainer}>
-                  <img src={article.image_url} alt={article.title} />
+                  <img src={image_url} alt={title} />
                 </div>
                 <div className={styles.miniArticleContent}>
-                  <h5>{article.title}</h5>
+                  <h5>{title}</h5>
                 </div>
               </div>
             ))}
@@ -103,15 +107,15 @@ const HomeStandardNews = () => {
 
 // newsLoader function fetches the latest articles from the server.
 // In case of an error, it returns an empty array.
-export async function newsLoader() {
+export const newsLoader = async () => {
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/news/latest-articles`);
+    const response = await fetch(`${REACT_APP_API_URL}/news/latest-articles`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const data = await response.json();
+    const { newsArticles } = await response.json();
 
-    return data.newsArticles;
+    return newsArticles;
   } catch (error) {
     console.error("Failed to load articles:", error);
     return []; //If no articles are retrieved from the server, the function will return an empty array

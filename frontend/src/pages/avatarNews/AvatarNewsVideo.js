@@ -5,7 +5,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVideo } from "@fortawesome/free-solid-svg-icons";
 import { useUser } from "../../store/UserContext";
 
-import loadingVideo from "./loading_circle_bars.mp4";
+import loadingVideo from "../../assets/loading_circle_bars.mp4";
+
+import config from '../../config/default'
+const {REACT_APP_API_URL, REACT_APP_PROXY_URL} = config;
+
 
 // WebRTC Peer Connection setup for cross-browser compatibility.
 const RTCPeerConnection = (
@@ -43,28 +47,31 @@ const AvatarNewsVideo = () => {
   const videoElement = videoRef.current;
 
   // Functions for managing the WebRTC connection and handling different events.
-  function onIceCandidate(event) {
-    console.log("onIceCandidate", event);
+  const onIceCandidate = (event)=>{
+      console.log("onIceCandidate", event);
     if (event.candidate) {
       const { candidate, sdpMid, sdpMLineIndex } = event.candidate;
 
-      fetchWithRetries(`${process.env.REACT_APP_PROXY_URL}/api/talks/streams/ice`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          streamId: streamId,
-          candidate: candidate,
-          sdpMid: sdpMid,
-          sdpMLineIndex: sdpMLineIndex,
-          sessionId: sessionId,
-        }),
-      });
+      fetchWithRetries(
+        `${REACT_APP_PROXY_URL}/api/talks/streams/ice`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            streamId,
+            candidate,
+            sdpMid,
+            sdpMLineIndex,
+            sessionId,
+          }),
+        }
+      );
     }
   }
 
-  function onIceConnectionStateChange() {
+  const onIceConnectionStateChange = ()=> {   
     if (
       peerConnection.iceConnectionState === "failed" ||
       peerConnection.iceConnectionState === "closed"
@@ -74,34 +81,36 @@ const AvatarNewsVideo = () => {
     }
   }
 
-  function onVideoStatusChange(videoIsPlaying, stream) {
+  const onVideoStatusChange = (videoIsPlaying, stream)=> {   
     if (videoIsPlaying) {
       const remoteStream = stream;
       setVideoElement(remoteStream);
     }
   }
 
-  function onTrack(event) {
-    if (!event.track) return;
+  const onTrack = (event)=> {    
+    const { track, streams } = event;
+    if (!track) return;
 
     statsIntervalId = setInterval(async () => {
-      const stats = await peerConnection.getStats(event.track);
+      const stats = await peerConnection.getStats(track);
       stats.forEach((report) => {
-        if (report.type === "inbound-rtp" && report.mediaType === "video") {
+        const { type, mediaType, bytesReceived } = report;
+        if (type === "inbound-rtp" && mediaType === "video") {
           const videoStatusChanged =
-            videoIsPlaying !== report.bytesReceived > lastBytesReceived;
+            videoIsPlaying !== bytesReceived > lastBytesReceived;
 
           if (videoStatusChanged) {
-            videoIsPlaying = report.bytesReceived > lastBytesReceived;
-            onVideoStatusChange(videoIsPlaying, event.streams[0]);
+            videoIsPlaying = bytesReceived > lastBytesReceived;
+            onVideoStatusChange(videoIsPlaying, streams[0]);
           }
-          lastBytesReceived = report.bytesReceived;
+          lastBytesReceived = bytesReceived;
         }
       });
     }, 500);
   }
 
-  async function createPeerConnection(offer, iceServers) {
+  const createPeerConnection = async (offer, iceServers) => {
     if (!peerConnection) {
       peerConnection = new RTCPeerConnection({ iceServers });
 
@@ -127,7 +136,7 @@ const AvatarNewsVideo = () => {
     return sessionClientAnswer;
   }
 
-  function setVideoElement(stream) {
+  const setVideoElement = (stream)=> {  
     const videoElement = videoRef.current;
     if (!stream || !videoElement) return;
 
@@ -138,15 +147,15 @@ const AvatarNewsVideo = () => {
     videoElement.play().catch((e) => console.error("Error playing video", e));
   }
 
-  function stopAllStreams() {
-    if (videoElement && videoElement.srcObject) {
+  const stopAllStreams=()=> {  
+    if (videoElement?.srcObject) {
       console.log("stopping video streams");
       videoElement.srcObject.getTracks().forEach((track) => track.stop());
       videoElement.srcObject = null;
     }
   }
 
-  function closePC(pc = peerConnection) {
+  const closePC=(pc = peerConnection)=> {  
     if (!pc) return;
     console.log("stopping peer connection");
     pc.close();
@@ -167,7 +176,7 @@ const AvatarNewsVideo = () => {
   const maxRetryCount = 3;
   const maxDelaySec = 4;
   // Function to retry fetching data with exponential backoff.
-  async function fetchWithRetries(url, options, retries = 1) {
+  const fetchWithRetries = async (url, options, retries = 1) => {
     try {
       return await fetch(url, options);
     } catch (err) {
@@ -202,7 +211,7 @@ const AvatarNewsVideo = () => {
           .play()
           .catch((e) => console.error("Error playing the video:", e));
 
-        if (peerConnection && peerConnection.connectionState === "connected") {
+        if (peerConnection?.connectionState === "connected") {
           return;
         }
 
@@ -210,7 +219,7 @@ const AvatarNewsVideo = () => {
         closePC();
 
         const sessionResponse = await fetchWithRetries(
-          `${process.env.REACT_APP_PROXY_URL}/api/talks/streams`,
+          `${REACT_APP_PROXY_URL}/api/talks/streams`,
           {
             method: "POST",
             headers: {
@@ -241,32 +250,35 @@ const AvatarNewsVideo = () => {
           return;
         }
 
-        await fetchWithRetries(`${process.env.REACT_APP_PROXY_URL}/api/talks/streams/sdp`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            streamId: newStreamId,
-            answer: sessionClientAnswer,
-            sessionId: newSessionId,
-          }),
-        });
+        await fetchWithRetries(
+          `${REACT_APP_PROXY_URL}/api/talks/streams/sdp`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              streamId: newStreamId,
+              answer: sessionClientAnswer,
+              sessionId: newSessionId,
+            }),
+          }
+        );
 
         if (
           peerConnection?.signalingState === "stable" ||
           peerConnection?.iceConnectionState === "connected"
         ) {
           await fetchWithRetries(
-            `${process.env.REACT_APP_PROXY_URL}/api/talks/streams/talk`,
+            `${REACT_APP_PROXY_URL}/api/talks/streams/talk`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                streamId: streamId,
-                sessionId: sessionId,
+                streamId,
+               sessionId,
                 text: article.title,
                 avatar: article.avatar,
               }),
@@ -297,10 +309,11 @@ const AvatarNewsVideo = () => {
 
   // Error handling and rendering logic.
   if (error) {
+    const { message } = error;
     let errorMessage = (
       <h2>There was an error on the site. Please try to enter later.</h2>
     );
-    if (error.message === "Authentication failed. Please log in.") {
+    if (message === "Authentication failed. Please log in.") {
       errorMessage = (
         <p className={styles.accessDeniedAlert}>
           In order to view the articles presented by avatars, you must{" "}
@@ -310,9 +323,9 @@ const AvatarNewsVideo = () => {
       );
       localStorage.removeItem("token");
       setUser();
-    } else if (error.message === "Article not found.") {
+    } else if (message === "Article not found.") {
       errorMessage = <h2>Article not found.</h2>;
-    } else if (error.message === "Server error. Please try again later.") {
+    } else if (message === "Server error. Please try again later.") {
       errorMessage = <h2>Server error. Please try again later.</h2>;
     }
     return <div className={styles.articleContainer}> {errorMessage} </div>;
@@ -322,7 +335,6 @@ const AvatarNewsVideo = () => {
     // In case an article was not found
     return (
       <div className={styles.articleContainer}>
-        {" "}
         <h2>Article not found.</h2>
       </div>
     );
@@ -349,7 +361,8 @@ const AvatarNewsVideo = () => {
 };
 
 // Loader function for the React Router to fetch article data.
-export async function avatarNewsVideoLoader({ params }) {
+export const avatarNewsVideoLoader = async ({ params }) => {
+  
   // Fetches and returns article data based on ID and user authentication token.
   const articleId = params.id;
   const token = localStorage.getItem("token");
@@ -361,7 +374,7 @@ export async function avatarNewsVideoLoader({ params }) {
 
   try {
     const response = await fetch(
-      `${process.env.REACT_APP_API_URL}/news/article?id=${articleId}`,
+      `${REACT_APP_API_URL}/news/article?id=${articleId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -388,8 +401,8 @@ export async function avatarNewsVideoLoader({ params }) {
       throw new Error(error);
     }
 
-    const data = await response.json();
-    return { article: data.article };
+    const {article} = await response.json();
+    return { article };
   } catch (error) {
     console.error("Failed to load blog:", error);
     return { error };

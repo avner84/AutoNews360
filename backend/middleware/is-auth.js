@@ -1,5 +1,5 @@
-require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const {JWT_SECRET} = require('../config/vars');
 
 module.exports = (req, res, next) => {
 
@@ -26,7 +26,7 @@ module.exports = (req, res, next) => {
   let decodedToken;
   try {
      // Verify the token using the secret key and decode it
-    decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    decodedToken = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     // Handle any errors during token verification (e.g., token is invalid or expired)
     err.message = 'Token verification failed. Please provide a valid token.';
